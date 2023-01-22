@@ -46,7 +46,12 @@ app.post("/newpost",async (req,res)=>{
     res.redirect("/")
 
 })
+app.get("/posts/:id",async (req,res)=>{
+    await Post.findById(req.params.id).then(post=>{
+        res.render("post",{post})
+    })
 
+})
 app.listen(port,host,()=>{
     console.log(`Server Online ... http://${host}:${port}`)
 })
