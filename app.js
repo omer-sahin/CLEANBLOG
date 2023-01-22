@@ -1,18 +1,32 @@
 const express=require("express")
 const ejs=require("ejs")
+const mongoose=require("mongoose");
+const Post=require("./models/Post")
 
 
 const port=3000;
 const  host="127.0.0.1"
 
-
-
+mongoose.set('strictQuery', false);
+mongoose.connect('mongodb://127.0.0.1:27017/cleanblog-db')
+  .then(() => console.log('Connected!'));
+ 
 const app=express();
+
+
+app.use(express.urlencoded({extended:true}))
+app.use(express.json())
 app.use(express.static("public"))
 app.set('view engine', 'ejs');
 
-app.get("/",(req,res)=>{
-    res.render("index")
+app.get("/",async (req,res)=>{
+    await Post.find({}).then(post=>{
+        res.render("index",{post:post})
+
+    })
+
+
+    
 })
 
 app.get("/about",(req,res)=>{
@@ -25,6 +39,12 @@ app.get("/addpost",(req,res)=>{
 })
 app.get("/post",(req,res)=>{
     res.render("post")
+})
+
+app.post("/newpost",async (req,res)=>{
+   await Post.create(req.body)
+    res.redirect("/")
+
 })
 
 app.listen(port,host,()=>{
